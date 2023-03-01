@@ -20,7 +20,6 @@ const alchemy = new Alchemy(settings);
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
-  const [nftABI, setNftABI] = useState('');
   const [balances, setBalances] = useState([]);
 
   useEffect(() => {
@@ -30,10 +29,6 @@ function App() {
 
     getBlockNumber();
   });
-
-  const handleInputChange = (event) => {
-    setNftABI(event.target.value);
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -54,13 +49,9 @@ function App() {
       <h1>Ethereum {Network.ETH_MAINNET}</h1>
       Block Number: {blockNumber}{' '}
       <form onSubmit={handleSubmit} className="Form">
-        <label>
-          Token Address:
-          <textarea value={nftABI} onChange={handleInputChange} />
-        </label>
-        <button type="submit">Get Balances</button>
+        <button type="submit">Get ETH Balances</button>
       </form>
-      {balances.length != 0 ? (
+      {balances.length !== 0 ? (
         <table>
           <thead>
             <tr>
