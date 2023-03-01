@@ -1,6 +1,6 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
-
+import { ethers } from 'ethers';
 import './App.css';
 
 // Refer to the README doc for more information about using API
@@ -20,6 +20,8 @@ const alchemy = new Alchemy(settings);
 
 function App() {
   const [blockNumber, setBlockNumber] = useState();
+  const [nftABI, setNftABI] = useState('');
+  const [balances, setBalances] = useState([]);
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -29,10 +31,55 @@ function App() {
     getBlockNumber();
   });
 
+  const handleInputChange = (event) => {
+    setNftABI(event.target.value);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    alchemy.core
+      .getTokenBalances('0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE')
+      .then((result) => {
+        console.log(result);
+        setBalances(result.tokenBalances);
+      });
+  };
+
+  const getEtherValue = (tokenBalance) => {
+    return ethers.utils.formatEther(tokenBalance);
+  };
+
   return (
     <div className="App">
       <h1>Ethereum {Network.ETH_MAINNET}</h1>
-      Block Number: {blockNumber}
+      Block Number: {blockNumber}{' '}
+      <form onSubmit={handleSubmit} className="Form">
+        <label>
+          Token Address:
+          <textarea value={nftABI} onChange={handleInputChange} />
+        </label>
+        <button type="submit">Get Balances</button>
+      </form>
+      {balances.length != 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances.map(({ contractAddress, tokenBalance }) => (
+              <tr key={contractAddress}>
+                <td>{contractAddress}</td>
+                <td>{getEtherValue(tokenBalance)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <h3>Enter the token address </h3>
+      )}
     </div>
   );
 }
