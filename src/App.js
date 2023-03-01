@@ -11,7 +11,6 @@ const settings = {
   network: Network.ETH_MAINNET,
 };
 
-
 // In this week's lessons we used ethers.js. Here we are using the
 // Alchemy SDK is an umbrella library with several different packages.
 //
@@ -30,7 +29,12 @@ function App() {
     getBlockNumber();
   });
 
-  return <div className="App">Block Number: {blockNumber}</div>;
+  return (
+    <div className="App">
+      <h1>Ethereum {Network.ETH_MAINNET}</h1>
+      Block Number: {blockNumber}
+    </div>
+  );
 }
 
 export default App;
