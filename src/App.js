@@ -21,6 +21,8 @@ const alchemy = new Alchemy(settings);
 function App() {
   const [blockNumber, setBlockNumber] = useState();
   const [balances, setBalances] = useState([]);
+  const [block, setblock] = useState(null);
+  const [searchBlock, setSearchBlock] = useState(0);
 
   useEffect(() => {
     async function getBlockNumber() {
@@ -30,12 +32,21 @@ function App() {
     getBlockNumber();
   });
 
-  const handleSubmit = async (event) => {
+  const getBlockTrasanctions = async (event) => {
+    event.preventDefault();
+    alchemy.core
+      .getBlockWithTransactions(Number(searchBlock))
+      .then((result) => {
+        console.log('result', result);
+        setblock(result);
+      });
+  };
+
+  const getTokenBalances = async (event) => {
     event.preventDefault();
     alchemy.core
       .getTokenBalances('0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE')
       .then((result) => {
-        console.log(result);
         setBalances(result.tokenBalances);
       });
   };
@@ -48,7 +59,29 @@ function App() {
     <div className="App">
       <h1>Ethereum {Network.ETH_MAINNET}</h1>
       Block Number: {blockNumber}{' '}
-      <form onSubmit={handleSubmit} className="Form">
+      <form onSubmit={getBlockTrasanctions} className="Form">
+        <label htmlFor="BlockNumber">Block Number: {''}</label>
+        <input
+          id="blockNumber"
+          type="number"
+          value={searchBlock}
+          onChange={(event) => setSearchBlock(event.target.value)}
+        />
+        <button type="submit"> Get Block Information </button>
+      </form>
+      {block !== null ? (
+        <div>
+          <h2>Block #{block.number}</h2>
+          <p>Timestamp: {new Date(block.timestamp * 1000).toString()}</p>
+          <p>Hash: {block.hash}</p>
+          <p>Ancestor: {block.parentHash}</p>
+          <p>Difficulty: {block.difficulty}</p>
+          <p>Count transactions: {block.transactions.length}</p>
+        </div>
+      ) : (
+        <h3>Click for obtain more information about the block </h3>
+      )}
+      <form onSubmit={getTokenBalances} className="Form">
         <button type="submit">Get ETH Balances</button>
       </form>
       {balances.length !== 0 ? (
